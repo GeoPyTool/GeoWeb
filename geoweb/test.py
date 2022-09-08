@@ -7,8 +7,6 @@ from bokeh.sampledata.sea_surface_temperature import sea_surface_temperature
 from functools import partial
 from os import path, listdir
 
-
-
 import time  # lgtm [py/unused-import]
 import json
 from pywebio.input import *
@@ -19,8 +17,11 @@ from pywebio_battery import *
 from pywebio import start_server
 from pywebio.platform import config
 from pywebio.session import local as session_local, info as session_info
+import pandas as pd
+import numpy as np
 
-# Adaped frome PyWebIO's official Demo of bokeh_app.py and doc_demo.py .
+
+# Adaped frome PyWebIO's official Demo of bokeh_app.py, input_usage and doc_demo.py .
 def t(eng, chinese):
     """return English or Chinese text according to the user's browser language"""
     return chinese if 'zh' in session_info.user_language else eng
@@ -56,11 +57,22 @@ def bkapp(doc):
 def main():
         # Upload a file and save to server                      
     f = file_upload("Upload a file")                  
-    open('asset/'+f['filename'], 'wb').write(f['content'])  
+    open('asset/'+f['filename'], 'wb').write(f['content'])     
+    
+    raw_df=pd.DataFrame()
 
-    imgs = file_upload("Select some pictures:", accept="image/*", multiple=True)
-    for img in imgs:
-        put_image(img['content'])
+    if ('csv' in f['filename']):
+        raw_df= pd.read_csv('asset/'+f['filename'], engine='python')
+    elif ('xls' in f['filename']):
+        raw_df= pd.read_excel('asset/'+f['filename'],engine='openpyxl')
+
+    print(len(raw_df),'\n',raw_df.to_dict())
+
+    put_table(raw_df.to_dict())
+
+    # imgs = file_upload("Select some pictures:", accept="image/*", multiple=True)
+    # for img in imgs:
+    #     put_image(img['content'])
     output_notebook(verbose=False, notebook_type='pywebio')
 
     if 'zh' in session_info.user_language:
@@ -83,7 +95,6 @@ def main():
         """)
 
     show(bkapp)
-    show(GetDataFile)
 
 
 if __name__ == '__main__':
