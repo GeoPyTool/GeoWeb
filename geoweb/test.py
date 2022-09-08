@@ -4,11 +4,16 @@ from bokeh.layouts import column
 from bokeh.models import ColumnDataSource, Slider
 from bokeh.plotting import figure
 from bokeh.sampledata.sea_surface_temperature import sea_surface_temperature
+
 from functools import partial
 from os import path, listdir
 
 import time  # lgtm [py/unused-import]
 import json
+import matplotlib
+import matplotlib.pyplot as plt
+matplotlib.use('agg')  # required, use a non-interactive backend
+import io
 from pywebio.input import *
 from pywebio.output import *
 from pywebio.session import *
@@ -30,8 +35,8 @@ def t(eng, chinese):
 here_dir = path.dirname(path.abspath(__file__))
 
 
-def bkapp(doc):
-    df = sea_surface_temperature.copy()
+def bkapp(doc,df = sea_surface_temperature.copy()):
+    df = df
     source = ColumnDataSource(data=df)
 
     plot = figure(x_axis_type='datetime', y_range=(0, 25),
@@ -53,28 +58,127 @@ def bkapp(doc):
 
 
 
+def DrawLine(l=[(41, 0), (41, 3), (45, 3)], color='grey', linewidth=0.5, linestyle='-', linelabel='',
+                alpha=0.5):
+    x = []
+    y = []
+    for i in l:
+        x.append(i[0])
+        y.append(i[1])
+    return (x, y)
+
+def tas(df = pd.DataFrame()):
+    df = df
+    
+    columns_list= df.columns.tolist()
+
+    Label_list = df['Label'].to_list()
+    Color_list = df['Color'].to_list()
+
+    SiO2= df['SiO2(wt%)'].to_list()
+    Na2O= df['Na2O(wt%)'].to_list()
+    K2O = df['K2O(wt%)'] .to_list()  
+    
+    Alkali = np.array(Na2O)+np.array(K2O)
+    Silica = np.array(SiO2)
+
+    fig, ax = plt.subplots()  # Create a figure containing a single axes.
+    ax.scatter(Silica , Alkali)  # Plot some data on the axes.
+
+
+    title= 'TAS (total alkali–silica) diagram Volcanic/Intrusive (Wilson et al. 1989)'
+
+    xlabel = r'$SiO_2 wt\%$'
+    ylabel = r'$Na_2O + K_2O wt\%$'
+
+    itemstocheck = ['SiO2', 'K2O', 'Na2O']
+    reference = 'Reference: Maitre, R. W. L., Streckeisen, A., Zanettin, B., Bas, M. J. L., Bonin, B., and Bateman, P., 2004, Igneous Rocks: A Classification and Glossary of Terms: Cambridge University Press, v. -1, no. 70, p. 93–120.'
+
+
+    ItemNames = ['Foidolite',
+                 'Peridotgabbro',
+                 'Foid Gabbro',
+                 'Foid Monzodiorite',
+                 'Foid Monzosyenite',
+                 'Foid Syenite',
+                 'Gabbro Bs',
+                 'Gabbro Ba',
+                 'Monzogabbro',
+                 'Monzodiorite',
+                 'Monzonite',
+                 'Syenite',
+                 'Quartz Monzonite',
+                 'Gabbroic Diorite',
+                 'Diorite',
+                 'Granodiorite',
+                 'Granite',
+                 'Quartzolite',
+                 ]
+
+    LocationAreas = [[[41, 3], [37, 3], [35, 9], [37, 14], [52.5, 18], [52.5, 14], [48.4, 11.5], [45, 9.4], [41, 7]],
+                     [[41, 0], [41, 3], [45, 3], [45, 0]],
+                     [[41, 3], [41, 7], [45, 9.4], [49.4, 7.3], [45, 5], [45, 3]],
+                     [[45, 9.4], [48.4, 11.5], [53, 9.3], [49.4, 7.3]],
+                     [[48.4, 11.5], [52.5, 14], [57.6, 11.7], [53, 9.3]],
+                     [[52.5, 14], [52.5, 18], [57, 18], [63, 16.2], [61, 13.5], [57.6, 11.7]],
+                     [[45, 0], [45, 2], [52, 5], [52, 0]],
+                     [[45, 2], [45, 5], [52, 5]],
+                     [[45, 5], [49.4, 7.3], [52, 5]],
+                     [[49.4, 7.3], [53, 9.3], [57, 5.9], [52, 5]],
+                     [[53, 9.3], [57.6, 11.7], [61, 8.6], [63, 7], [57, 5.9]],
+                     [[57.6, 11.7], [61, 13.5], [63, 16.2], [71.8, 13.5], [61, 8.6]],
+                     [[61, 8.6], [71.8, 13.5], [69, 8], [63, 7]],
+                     [[52, 0], [52, 5], [57, 5.9], [57, 0]],
+                     [[57, 0], [57, 5.9], [63, 7], [63, 0]],
+                     [[63, 0], [63, 7], [69, 8], [77.3, 0]],
+                     [[77.3, 0], [69, 8], [71.8, 13.5], [85.9, 6.8], [87.5, 4.7]],
+                     [[77.3, 0], [87.5, 4.7], [90, 4.7], [90, 0]],
+                     ]
+
+    DrawLine_List=[
+    DrawLine([(41, 0), (41, 3), (45, 3)]),
+    DrawLine([(45, 0), (45, 3), (45, 5), (49.4, 7.3), (53, 9.3), (57.6, 11.7), (61, 13.5), (63, 16.2)], ),
+    DrawLine([(52, 5), (57, 5.9), (63, 7), (69, 8), (71.8, 13.5), (61, 8.6)]),
+    DrawLine([(45, 2), (45, 5), (52, 5), (45, 2)]),
+    DrawLine(
+        [(69, 8), (77.3, 0), (87.5, 4.7), (85.9, 6.8), (71.8, 13.5), (63, 16.2), (57, 18), (52.5, 18), (37, 14),
+            (35, 9), (37, 3), (41, 3)]),
+    DrawLine([(63, 0), (63, 7), (57.6, 11.7), (52.5, 14), (52.5, 18)]),
+    DrawLine([(57, 0), (57, 5.9), (53, 9.3), (48.4, 11.5)]),
+    DrawLine([(52, 0), (52, 5), (49.4, 7.3), (45, 9.4)]),
+    DrawLine([(41, 3), (41, 7), (45, 9.4)]),
+    DrawLine([(45, 9.4), (48.4, 11.5), (52.5, 14)])
+    ]
+
+    for i in DrawLine_List:
+        print(i)
+        ax.plot(i)
+    
+    ax.spines['right'].set_color('none')
+    ax.spines['top'].set_color('none')
+
+    ax.set_xticks([30,40,50,60,70,80,90])
+    ax.set_xticklabels([30,40,50,60,70,80,90])
+
+    ax.set_yticks([0, 5, 10, 15, 20])
+    ax.set_yticklabels([0, 5, 10, 15, 20])
+
+    # ax.set_xlim(bottom=0)
+    # ax.set_ylim(bottom=0)
+
+    buf = io.BytesIO()
+    fig.savefig(buf)
+    put_image(buf.getvalue())
+
 
 def main():
-
     output_notebook(verbose=False, notebook_type='pywebio')
+    # if 'zh' in session_info.user_language:pass
+    # else:pass
+    put_markdown("""# GeoWeb Applications by PyWebIO
+        This is based on a [Bokeh Application](https://docs.bokeh.org/en/latest/docs/user_guide/server.html) which can be built by starting the Bokeh server. The purpose of the Bokeh server is to make it easy for Python users to create interactive web applications that can connect front-end UI events to real, running Python code.
 
-    if 'zh' in session_info.user_language:
-        put_markdown("""# Bokeh Applications in PyWebIO
-        [Bokeh Applications](https://docs.bokeh.org/en/latest/docs/user_guide/server.html) 支持向图表的添加按钮、输入框等交互组件，并向组件添加Python回调，从而创建可以与Python代码交互的可视化图表。
-
-        在PyWebIO中，你也可以使用 `bokeh.io.show()` 来显示一个Bokeh App，和输出普通图表一样，只需要在会话开始时调用 `bokeh.io.output_notebook(notebook_type='pywebio')` 来设置PyWebIO输出环境。
-
-        以下为一个 Bokeh App demo:
-        """)
-    else:
-        put_markdown("""# Bokeh Applications in PyWebIO
-        [Bokeh Applications](https://docs.bokeh.org/en/latest/docs/user_guide/server.html) can be built by starting the Bokeh server. The purpose of the Bokeh server is to make it easy for Python users to create interactive web applications that can connect front-end UI events to real, running Python code.
-
-        In PyWebIO, you can also use bokeh.io.show() to display a Bokeh App.
-
-        You can use `bokeh.io.output_notebook(notebook_type='pywebio')` in the PyWebIO session to setup Bokeh environment. Then you can use `bokeh.io.show()` to output a boken application.
-
-        This is a demo of Bokeh App: 
+        With PyWebIO + Pandas + Bokeh, GeoWeb allow user to upload a csv or excel file and then ploted below.
         """)
 
     # Upload a file and save to server                      
@@ -98,8 +202,8 @@ def main():
     # for img in imgs:
     #     put_image(img['content'])
 
-
-    show(bkapp)
+    # show(bkapp)
+    tas(df = raw_df)
 
 
 if __name__ == '__main__':
