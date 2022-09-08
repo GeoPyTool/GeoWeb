@@ -19,3 +19,9 @@ Coding is still better way for me to live on than writing articles I think.
 Tired of those tiny little groups playing with the funds.
 
 At least I don't need to be a joker or clown to the money holders.
+
+## Pre-Installation
+
+```Bash
+pip install -r requirements.txt
+```

@@ -4,12 +4,29 @@ from bokeh.layouts import column
 from bokeh.models import ColumnDataSource, Slider
 from bokeh.plotting import figure
 from bokeh.sampledata.sea_surface_temperature import sea_surface_temperature
+from functools import partial
+from os import path, listdir
 
-from pywebio import start_server
+
+
+import time  # lgtm [py/unused-import]
+import json
+from pywebio.input import *
 from pywebio.output import *
-from pywebio.session import info as session_info
+from pywebio.session import *
+from pywebio.pin import *
+from pywebio_battery import *
+from pywebio import start_server
+from pywebio.platform import config
+from pywebio.session import local as session_local, info as session_info
 
-# Adaped frome PyWebIO's official Demo of bokeh_app.py .
+# Adaped frome PyWebIO's official Demo of bokeh_app.py and doc_demo.py .
+def t(eng, chinese):
+    """return English or Chinese text according to the user's browser language"""
+    return chinese if 'zh' in session_info.user_language else eng
+
+
+here_dir = path.dirname(path.abspath(__file__))
 
 
 def bkapp(doc):
@@ -34,7 +51,16 @@ def bkapp(doc):
     doc.add_root(column([slider, plot], sizing_mode='stretch_width'))
 
 
+
+
 def main():
+        # Upload a file and save to server                      
+    f = file_upload("Upload a file")                  
+    open('asset/'+f['filename'], 'wb').write(f['content'])  
+
+    imgs = file_upload("Select some pictures:", accept="image/*", multiple=True)
+    for img in imgs:
+        put_image(img['content'])
     output_notebook(verbose=False, notebook_type='pywebio')
 
     if 'zh' in session_info.user_language:
@@ -57,6 +83,7 @@ def main():
         """)
 
     show(bkapp)
+    show(GetDataFile)
 
 
 if __name__ == '__main__':
