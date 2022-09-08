@@ -24,7 +24,7 @@ from pywebio.platform import config
 from pywebio.session import local as session_local, info as session_info
 import pandas as pd
 import numpy as np
-
+from xml.dom import minidom
 
 # Adaped frome PyWebIO's official Demo of bokeh_app.py, input_usage and doc_demo.py .
 def t(eng, chinese):
@@ -72,8 +72,8 @@ def tas(df = pd.DataFrame()):
     Alkali = np.array(Na2O)+np.array(K2O)
     Silica = np.array(SiO2)
 
-    fig, ax = plt.subplots()  # Create a figure containing a single axes.
-    ax.scatter(Silica , Alkali)  # Plot some data on the axes.
+    fig, ax = plt.subplots()  # Create a figure containing a single ax.
+    ax.scatter(Silica , Alkali, color = Color_list, label = Label_list)  # Plot some data on the ax.
 
 
     title= 'TAS (total alkali–silica) diagram Volcanic/Intrusive (Wilson et al. 1989)'
@@ -165,6 +165,9 @@ def tas(df = pd.DataFrame()):
             x.append(i[0])
             y.append(i[1])
         ax.plot(x, y, color='grey', alpha=0.8)
+
+    ax.set_xlabel(xlabel)
+    ax.set_ylabel(ylabel)
     
     ax.spines['right'].set_color('none')
     ax.spines['top'].set_color('none')
@@ -174,13 +177,14 @@ def tas(df = pd.DataFrame()):
 
     ax.set_yticks([0, 5, 10, 15, 20])
     ax.set_yticklabels([0, 5, 10, 15, 20])
-
-    # ax.set_xlim(bottom=0)
-    # ax.set_ylim(bottom=0)
-
     buf = io.BytesIO()
     fig.savefig(buf)
     put_image(buf.getvalue())
+    
+    fig.savefig('./result/vector.svg',format = 'svg') # Save the SVG
+
+    svg_file = open('./result/vector.svg', 'rb').read()   # Read the SVG 
+    put_file('vector.svg', svg_file, 'Download the SVG file here')
 
 
 def main():
@@ -190,7 +194,7 @@ def main():
     put_markdown("""# GeoWeb Applications by PyWebIO
         This is based on a [Bokeh Application](https://docs.bokeh.org/en/latest/docs/user_guide/server.html) which can be built by starting the Bokeh server. The purpose of the Bokeh server is to make it easy for Python users to create interactive web applications that can connect front-end UI events to real, running Python code.
 
-        With PyWebIO + Pandas + Bokeh, GeoWeb allow user to upload a csv or excel file and then ploted below.
+        With PyWebIO + Pandas + Bokeh/Matplotlib, GeoWeb allow user to upload a csv or excel file and then ploted below.
         """)
 
     # Upload a file and save to server                      
