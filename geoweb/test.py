@@ -55,24 +55,7 @@ def bkapp(doc):
 
 
 def main():
-        # Upload a file and save to server                      
-    f = file_upload("Upload a file")                  
-    open('asset/'+f['filename'], 'wb').write(f['content'])     
-    
-    raw_df=pd.DataFrame()
 
-    if ('csv' in f['filename']):
-        raw_df= pd.read_csv('asset/'+f['filename'], engine='python')
-    elif ('xls' in f['filename']):
-        raw_df= pd.read_excel('asset/'+f['filename'],engine='openpyxl')
-
-    print(len(raw_df),'\n',raw_df.to_dict())
-
-    put_table(raw_df.to_dict())
-
-    # imgs = file_upload("Select some pictures:", accept="image/*", multiple=True)
-    # for img in imgs:
-    #     put_image(img['content'])
     output_notebook(verbose=False, notebook_type='pywebio')
 
     if 'zh' in session_info.user_language:
@@ -93,6 +76,28 @@ def main():
 
         This is a demo of Bokeh App: 
         """)
+
+    # Upload a file and save to server                      
+    f = file_upload("Upload a file")                  
+    open('asset/'+f['filename'], 'wb').write(f['content'])     
+    
+    raw_df=pd.DataFrame()
+
+    if ('csv' in f['filename']):
+        raw_df= pd.read_csv('asset/'+f['filename'], engine='python')
+    elif ('xls' in f['filename']):
+        raw_df= pd.read_excel('asset/'+f['filename'],engine='openpyxl')
+
+    print(len(raw_df),'\n')
+    if(len(raw_df)>0):
+        res_table = put_html(raw_df.to_html(classes='table table-stripped',justify = 'center'))
+        put_scrollable( res_table ,horizon_scroll=True,vertical_scroll=True,height=450)
+
+
+    # imgs = file_upload("Select some pictures:", accept="image/*", multiple=True)
+    # for img in imgs:
+    #     put_image(img['content'])
+
 
     show(bkapp)
 
