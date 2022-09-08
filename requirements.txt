@@ -1,5 +1,7 @@
 tornado>=5.0
 user-agents
+bokeh
+pandas
 
 # extra support
 flask
