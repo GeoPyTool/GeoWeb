@@ -57,16 +57,6 @@ def bkapp(doc,df = sea_surface_temperature.copy()):
     doc.add_root(column([slider, plot], sizing_mode='stretch_width'))
 
 
-
-def DrawLine(l=[(41, 0), (41, 3), (45, 3)], color='grey', linewidth=0.5, linestyle='-', linelabel='',
-                alpha=0.5):
-    x = []
-    y = []
-    for i in l:
-        x.append(i[0])
-        y.append(i[1])
-    return (x, y)
-
 def tas(df = pd.DataFrame()):
     df = df
     
@@ -95,6 +85,7 @@ def tas(df = pd.DataFrame()):
     reference = 'Reference: Maitre, R. W. L., Streckeisen, A., Zanettin, B., Bas, M. J. L., Bonin, B., and Bateman, P., 2004, Igneous Rocks: A Classification and Glossary of Terms: Cambridge University Press, v. -1, no. 70, p. 93–120.'
 
 
+
     ItemNames = ['Foidolite',
                  'Peridotgabbro',
                  'Foid Gabbro',
@@ -115,7 +106,25 @@ def tas(df = pd.DataFrame()):
                  'Quartzolite',
                  ]
 
-    LocationAreas = [[[41, 3], [37, 3], [35, 9], [37, 14], [52.5, 18], [52.5, 14], [48.4, 11.5], [45, 9.4], [41, 7]],
+
+    Labels = [u'F', u'Pc', u'U1', u'Ba', u'Bs', u'S1', u'U2', u'O1', u'S2', u'U3', u'O2', u'S3', u'Ph', u'O3',
+                u'T',
+                u'Td', u'R', u'Q', u'T/U/I']
+
+    Locations = [(39, 10), (43, 1.5), (44, 6), (47.5, 3.5), (49.5, 1.5), (49, 5.2), (49, 9.5), (54, 3), (53, 7),
+                    (53, 12),
+                    (60, 4),
+                    (57, 8.5), (57, 14), (67, 5), (65, 12), (67, 9), (75, 9), (85, 1), (55, 18.5)]
+    X_offset = -6
+    Y_offset = 3
+
+
+    TagNumber = min(len(Labels), len(Locations))
+    for k in range(TagNumber):
+        ax.annotate(Labels[k], Locations[k], xycoords='data', xytext=(X_offset, Y_offset), textcoords='offset points',fontsize=9, color='grey', alpha=0.8)
+
+
+    LocationAreas = [[[41, 3], [37, 3], [35, 9], [37, 14], [52.5, 18], [52.5, 14],  [48.4, 11.5], [45, 9.4], [41, 7]],
                      [[41, 0], [41, 3], [45, 3], [45, 0]],
                      [[41, 3], [41, 7], [45, 9.4], [49.4, 7.3], [45, 5], [45, 3]],
                      [[45, 9.4], [48.4, 11.5], [53, 9.3], [49.4, 7.3]],
@@ -135,24 +144,27 @@ def tas(df = pd.DataFrame()):
                      [[77.3, 0], [87.5, 4.7], [90, 4.7], [90, 0]],
                      ]
 
-    DrawLine_List=[
-    DrawLine([(41, 0), (41, 3), (45, 3)]),
-    DrawLine([(45, 0), (45, 3), (45, 5), (49.4, 7.3), (53, 9.3), (57.6, 11.7), (61, 13.5), (63, 16.2)], ),
-    DrawLine([(52, 5), (57, 5.9), (63, 7), (69, 8), (71.8, 13.5), (61, 8.6)]),
-    DrawLine([(45, 2), (45, 5), (52, 5), (45, 2)]),
-    DrawLine(
-        [(69, 8), (77.3, 0), (87.5, 4.7), (85.9, 6.8), (71.8, 13.5), (63, 16.2), (57, 18), (52.5, 18), (37, 14),
-            (35, 9), (37, 3), (41, 3)]),
-    DrawLine([(63, 0), (63, 7), (57.6, 11.7), (52.5, 14), (52.5, 18)]),
-    DrawLine([(57, 0), (57, 5.9), (53, 9.3), (48.4, 11.5)]),
-    DrawLine([(52, 0), (52, 5), (49.4, 7.3), (45, 9.4)]),
-    DrawLine([(41, 3), (41, 7), (45, 9.4)]),
-    DrawLine([(45, 9.4), (48.4, 11.5), (52.5, 14)])
-    ]
 
-    for i in DrawLine_List:
-        print(i)
-        ax.plot(i)
+    tas_line_List=[
+        [(41, 0), (41, 3), (45, 3)],
+        [(45, 0), (45, 3), (45, 5), (49.4, 7.3), (53, 9.3), (57.6, 11.7), (61, 13.5), (63, 16.2)],
+        [(52, 5), (57, 5.9), (63, 7), (69, 8), (71.8, 13.5), (61, 8.6)],
+        [(45, 2), (45, 5), (52, 5), (45, 2)],
+        [(69, 8), (77.3, 0), (87.5, 4.7), (85.9, 6.8), (71.8, 13.5), (63, 16.2), (57, 18), (52.5, 18), (37, 14), (35, 9), (37, 3), (41, 3)],
+        [(63, 0), (63, 7), (57.6, 11.7), (52.5, 14), (52.5, 18)],
+        [(57, 0), (57, 5.9), (53, 9.3), (48.4, 11.5)],
+        [(52, 0), (52, 5), (49.4, 7.3), (45, 9.4)],
+        [(41, 3), (41, 7), (45, 9.4)],
+        [(45, 9.4), (48.4, 11.5), (52.5, 14)]
+        ]
+
+    for k in tas_line_List:
+        x = []
+        y = []
+        for i in k:
+            x.append(i[0])
+            y.append(i[1])
+        ax.plot(x, y, color='grey', alpha=0.8)
     
     ax.spines['right'].set_color('none')
     ax.spines['top'].set_color('none')
