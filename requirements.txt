@@ -16,6 +16,7 @@ cutecharts
 pyecharts
 plotly
 Pillow
+openpyxl
 
 # test requirements
 selenium==3.*
