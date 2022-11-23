@@ -32,6 +32,7 @@ sphinx-intl
 # git+https://github.com/pywebio/pywebio-battery.git
 pywebio_battery
 pywebio
+nicegui
 # demo running requirements
 numpy
 matplotlib
