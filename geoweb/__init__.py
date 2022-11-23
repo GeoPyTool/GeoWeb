@@ -37,21 +37,24 @@ def handle_upload(e: UploadEventArguments) -> None:
     name = e.names
     content = e.files
     # print(f'{name=}, {len(content)=}', flush=True)    
-    global file_names
+    global file_name
     global file_content
-    file_names = e.names[0]
+    file_name = e.names[0]
     file_content = e.files[0]
-    x = np.linspace(0.0, 5.0)
-    y = np.cos(2 * np.pi * x) * np.exp(-x)
+    print(file_name,type(file_content))
+    extract_data(file_name,file_content)
 
+
+def extract_data(name = 'file_name', file_content =bytes() ):
     # string_content = str(file_content,'utf-8')
     # data = StringIO(string_content )
     # df = pd.read_csv(data)
+    df = pd.DataFrame()
     bytes_data = file_content
-    print(name[0])
-    if 'csv' in name[0]:
+    print(name)
+    if 'csv' in name:
         df = pd.read_csv(BytesIO(bytes_data))
-    elif 'xls' in name[0]:
+    elif 'xls' in name:
         df = pd.read_excel(BytesIO(bytes_data),engine='openpyxl')
     else:
         pass
