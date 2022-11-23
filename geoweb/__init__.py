@@ -66,13 +66,15 @@ def make_plot(x=[],y=[],color='green', marker='o', linestyle='dashed',linewidth=
 
 
 def saveIMG():
-    plt.savefig('vector.svg')
-    ui.link('Vector File', 'vector.svg')
+    plt.savefig('Pictures/vector.svg')
+    ui.link('Vector File', 'Pictures/vector.svg')
 
 
 def main():
 
     ui.upload(on_upload=handle_upload)
+
+    ui.add_static_files('/Pictures', 'Pictures')
     ui.run()
 
 main()
